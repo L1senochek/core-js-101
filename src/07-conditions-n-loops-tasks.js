@@ -442,27 +442,21 @@ function getMatrixProduct(m1, m2) {
   const cols1 = m1[0].length;
   const rows2 = m2.length;
   const cols2 = m2[0].length;
+  const result = [];
 
   if (cols1 !== rows2) {
     throw new Error('Invalid matrix');
   }
-
-  const result = [];
-
   for (let i = 0; i < rows1; i += 1) {
     result[i] = [];
-
     for (let j = 0; j < cols2; j += 1) {
       let sum = 0;
-
       for (let k = 0; k < cols1; k += 1) {
         sum += m1[i][k] * m2[k][j];
       }
-
       result[i][j] = sum;
     }
   }
-
   return result;
 }
 
@@ -497,8 +491,30 @@ function getMatrixProduct(m1, m2) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  // throw new Error('Not implemented');
+  const winCombo = [
+    // Rows
+    [position[0][0], position[0][1], position[0][2]],
+    [position[1][0], position[1][1], position[1][2]],
+    [position[2][0], position[2][1], position[2][2]],
+    // Columns
+    [position[0][0], position[1][0], position[2][0]],
+    [position[0][1], position[1][1], position[2][1]],
+    [position[0][2], position[1][2], position[2][2]],
+    // Diagonals
+    [position[0][0], position[1][1], position[2][2]],
+    [position[0][2], position[1][1], position[2][0]],
+  ];
+
+  const win = winCombo.reduce((result, combination) => {
+    if (combination[0] && combination[0] === combination[1] && combination[1] === combination[2]) {
+      return combination[0];
+    }
+    return result;
+  }, undefined);
+
+  return win || undefined;
 }
 
 
