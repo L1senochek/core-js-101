@@ -20,9 +20,28 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  // throw new Error('Not implemented');
+  this.width = width;
+  this.height = height;
 }
+
+Rectangle.prototype = {
+  getArea() {
+    return this.width * this.height;
+  },
+};
+
+// class Rectangle {
+//   constructor(width, height) {
+//     this.width = width;
+//     this.height = height;
+//   }
+
+//   getArea() {
+//     return this.width * this.height;
+//   }
+// }
 
 
 /**
@@ -35,8 +54,9 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  // throw new Error('Not implemented');
+  return JSON.stringify(obj);
 }
 
 
@@ -51,8 +71,10 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  // throw new Error('Not implemented');
+  // return Object.create(proto, Object.getOwnPropertyDescriptors(JSON.parse(json)));
+  return Object.setPrototypeOf(JSON.parse(json), proto);
 }
 
 
@@ -111,32 +133,53 @@ function fromJSON(/* proto, json */) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  selector: '',
+
+  createSelector(order, value, selector, extraSelector = '') {
+    if (this.order === order && ['', '#', '::'].includes(selector)) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    if (this.order > order) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+
+    const newSelector = Object.create(cssSelectorBuilder);
+    newSelector.order = order;
+    newSelector.selector = `${this.selector}${selector}${value}${extraSelector}`;
+
+    return newSelector;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    return this.createSelector(1, value, '');
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return this.createSelector(2, value, '#');
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return this.createSelector(3, value, '.');
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    return this.createSelector(4, value, '[', ']');
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    return this.createSelector(5, value, ':');
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    return this.createSelector(6, value, '::');
+  },
+
+  combine(selector1, combinator, selector2) {
+    return this.createSelector(0, ` ${combinator} `, selector1.stringify(), selector2.stringify());
+  },
+
+  stringify() {
+    return this.selector;
   },
 };
 
